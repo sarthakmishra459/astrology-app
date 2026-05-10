@@ -1,114 +1,97 @@
 import React from "react";
 import { View } from "react-native";
-import Svg, { Path, Line, Text as SvgText, G } from "react-native-svg";
-
-const GLYPHS: any = {
-  Sun: "☉",
-  Moon: "☽",
-  Mars: "♂",
-  Mercury: "☿",
-  Jupiter: "♃",
-  Venus: "♀",
-  Saturn: "♄",
-  Rahu: "☊",
-  Ketu: "☋",
-};
+import Svg, { Polygon, Text as SvgText, Defs, LinearGradient, Stop } from "react-native-svg";
 
 export default function NorthIndianChart({ chartData }: any) {
-  const size = 320;
-  const center = size / 2;
-  const outer = size * 0.45;
-  const inner = size * 0.15;
+  const planetsByHouse = chartData?.planetsByHouse || {};
 
-  const rashiOrder = [
-    "aries","taurus","gemini","cancer","leo","virgo",
-    "libra","scorpio","sagittarius","capricorn","aquarius","pisces"
-  ];
-
-  // 🔥 EXACT BLOG LOGIC
-  const lagnaIndex = rashiOrder.indexOf(
-    chartData.lagna.toLowerCase()
-  );
-
-  const angles = [
-    90,120,150,180,210,240,270,300,330,0,30,60
-  ];
-
-  const rashis = angles.map((angle, i) => {
-    const index = (i + lagnaIndex) % 12;
-    return { rashi: rashiOrder[index], angle };
-  });
-
-  const getPos = (angle: number, dist: number) => {
-    const rad = (angle * Math.PI) / 180;
-    return {
-      x: center + Math.cos(rad) * dist,
-      y: center - Math.sin(rad) * dist,
-    };
+  const getPlanets = (house: number) => {
+    const planets = planetsByHouse[house] || [];
+    return planets
+      .map((p: any) => p.name.slice(0, 2))
+      .join(" ");
   };
 
   return (
     <View>
-      <Svg width={size} height={size}>
-        {/* Diamond */}
-        <Path
-          d={`M ${center},${center - outer}
-              L ${center + outer},${center}
-              L ${center},${center + outer}
-              L ${center - outer},${center} Z`}
-          fill="white"
-          stroke="black"
-          strokeWidth={2}
-        />
+      <Svg width={350} height={300} viewBox="0 0 400 300">
+        {/* 🔥 Gradient */}
+        <Defs>
+          <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor="white" />
+            <Stop offset="100%" stopColor="#f0f3bf" />
+          </LinearGradient>
+        </Defs>
 
-        {/* Inner */}
-        <Path
-          d={`M ${center},${center - inner}
-              L ${center + inner},${center}
-              L ${center},${center + inner}
-              L ${center - inner},${center} Z`}
-          fill="none"
-          stroke="black"
-        />
+        {/* 🔥 Houses (converted from your Python EXACTLY) */}
 
-        {/* Cross */}
-        <Line x1={center} y1={0} x2={center} y2={size} stroke="black" />
-        <Line x1={0} y1={center} x2={size} y2={center} stroke="black" />
+        {/* 1 */}
+        <Polygon points="100,225 200,300 300,225 200,150" fill="url(#grad)" stroke="black"/>
+        {/* 2 */}
+        <Polygon points="100,225 0,300 200,300" fill="url(#grad)" stroke="black"/>
+        {/* 3 */}
+        <Polygon points="0,150 0,300 100,225" fill="url(#grad)" stroke="black"/>
+        {/* 4 */}
+        <Polygon points="0,150 100,225 200,150 100,75" fill="url(#grad)" stroke="black"/>
+        {/* 5 */}
+        <Polygon points="0,0 0,150 100,75" fill="url(#grad)" stroke="black"/>
+        {/* 6 */}
+        <Polygon points="0,0 100,75 200,0" fill="url(#grad)" stroke="black"/>
+        {/* 7 */}
+        <Polygon points="100,75 200,150 300,75 200,0" fill="url(#grad)" stroke="black"/>
+        {/* 8 */}
+        <Polygon points="200,0 300,75 400,0" fill="url(#grad)" stroke="black"/>
+        {/* 9 */}
+        <Polygon points="300,75 400,150 400,0" fill="url(#grad)" stroke="black"/>
+        {/* 10 */}
+        <Polygon points="300,75 200,150 300,225 400,150" fill="url(#grad)" stroke="black"/>
+        {/* 11 */}
+        <Polygon points="300,225 400,300 400,150" fill="url(#grad)" stroke="black"/>
+        {/* 12 */}
+        <Polygon points="300,225 200,300 400,300" fill="url(#grad)" stroke="black"/>
 
-        {/* 🔥 EXACT RENDER */}
-        {rashis.map(({ rashi, angle }) => {
-          const pos = getPos(angle, (outer + inner) / 2);
-
-          const planets = chartData.planetsByRashi[rashi] || [];
-          const isLagna = rashi === chartData.lagna.toLowerCase();
-
+        {/* 🔥 House Numbers */}
+        {[7,8,9,10,11,12,1,2,3,4,5,6].map((num, i) => {
+          const positions = [
+            [195,130],[97,60],[75,78],[170,152],[75,227],[95,245],
+            [195,170],[295,245],[320,227],[220,152],[320,77],[295,60]
+          ];
           return (
-            <G key={rashi}>
-              <SvgText
-                x={pos.x}
-                y={pos.y - 25}
-                fontSize={9}
-                fill={isLagna ? "red" : "#999"}
-                textAnchor="middle"
-              >
-                {rashi.charAt(0).toUpperCase() + rashi.slice(1)}
-                {isLagna && " (ASC)"}
-              </SvgText>
-
-              {planets.map((p: any, i: number) => (
-                <SvgText
-                  key={p.name}
-                  x={pos.x}
-                  y={pos.y - 5 + i * 16}
-                  fontSize={13}
-                  textAnchor="middle"
-                >
-                  {GLYPHS[p.name]}
-                  {p.isRetrograde && "℞"}
-                </SvgText>
-              ))}
-            </G>
+            <SvgText
+              key={i}
+              x={positions[i][0]}
+              y={positions[i][1]}
+              fontSize="12"
+              fill="teal"
+              textAnchor="middle"
+            >
+              {num}
+            </SvgText>
           );
+        })}
+
+        {/* 🔥 Planets */}
+        {Object.keys(planetsByHouse).map((house: any) => {
+          const centerMap: any = {
+            1:[190,75],2:[100,30],3:[30,75],4:[90,150],
+            5:[30,225],6:[90,278],7:[190,225],8:[290,278],
+            9:[360,225],10:[290,150],11:[360,75],12:[290,30],
+          };
+
+          const center = centerMap[house];
+          const planets = planetsByHouse[house] || [];
+
+          return planets.map((p: any, i: number) => (
+            <SvgText
+              key={house + i}
+              x={center[0]}
+              y={center[1] + i * 12}
+              fontSize="11"
+              textAnchor="middle"
+            >
+              {p.name.slice(0, 2)}
+            </SvgText>
+          ));
         })}
       </Svg>
     </View>
