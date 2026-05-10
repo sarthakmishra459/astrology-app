@@ -8,6 +8,43 @@ import { Platform } from 'react-native';
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+export const AppColors = {
+  background: '#f6f3ee',
+  surface: '#fffaf2',
+  surfaceElevated: '#ffffff',
+  ink: '#141824',
+  muted: '#667085',
+  subtle: '#e7ded0',
+  line: '#dacfc0',
+  indigo: '#263a7a',
+  indigoSoft: '#e9edff',
+  gold: '#b9822f',
+  goldSoft: '#fff1d6',
+  teal: '#0f766e',
+  tealSoft: '#dff7f3',
+  rose: '#b42318',
+  roseSoft: '#fee4e2',
+  green: '#167447',
+  greenSoft: '#dcfae6',
+};
+
+export const AppShadows = {
+  card: {
+    shadowColor: '#2f2518',
+    shadowOpacity: 0.09,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
+  },
+  soft: {
+    shadowColor: '#2f2518',
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
+  },
+};
+
 export const Colors = {
   light: {
     text: '#11181C',

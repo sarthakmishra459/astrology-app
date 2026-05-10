@@ -8,6 +8,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Collapsible from "react-native-collapsible";
 import Svg, { Circle } from "react-native-svg";
+import { AppColors, AppShadows } from "@/constants/theme";
 
 export type InsightCardData = {
   key: string;
@@ -31,22 +32,22 @@ type Props = {
 
 const toneColors = {
   supportive: {
-    accent: "#15803d",
-    surface: "#f0fdf4",
-    border: "#bbf7d0",
-    text: "#166534",
+    accent: AppColors.green,
+    surface: AppColors.greenSoft,
+    border: "#b6e8c8",
+    text: "#14532d",
   },
   mixed: {
-    accent: "#ca8a04",
-    surface: "#fefce8",
-    border: "#fef08a",
-    text: "#854d0e",
+    accent: AppColors.gold,
+    surface: AppColors.goldSoft,
+    border: "#f1d49d",
+    text: "#7c4a03",
   },
   needs_attention: {
-    accent: "#dc2626",
-    surface: "#fef2f2",
-    border: "#fecaca",
-    text: "#991b1b",
+    accent: AppColors.rose,
+    surface: AppColors.roseSoft,
+    border: "#f6b8b2",
+    text: "#7a271a",
   },
 };
 
@@ -135,7 +136,7 @@ export default function InsightCard({ card }: Props) {
           <Ionicons
             name={collapsed ? "chevron-down" : "chevron-up"}
             size={22}
-            color="#64748b"
+            color={AppColors.muted}
           />
         </View>
       </TouchableOpacity>
@@ -159,7 +160,7 @@ export default function InsightCard({ card }: Props) {
               <View style={styles.pillRow}>
                 {card.primary_planets.map((planet) => (
                   <View key={planet} style={styles.planetPill}>
-                    <Ionicons name="planet-outline" size={14} color="#475569" />
+                    <Ionicons name="planet-outline" size={14} color={AppColors.indigo} />
                     <Text style={styles.planetText}>{planet}</Text>
                   </View>
                 ))}
@@ -207,16 +208,12 @@ export default function InsightCard({ card }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: AppColors.surfaceElevated,
     borderRadius: 8,
     borderWidth: 1,
     marginBottom: 14,
     padding: 14,
-    shadowColor: "#0f172a",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
+    ...AppShadows.card,
   },
   header: {
     alignItems: "center",
@@ -242,12 +239,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: "#0f172a",
+    color: AppColors.ink,
     fontSize: 18,
     fontWeight: "800",
   },
   area: {
-    color: "#64748b",
+    color: AppColors.muted,
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
@@ -272,7 +269,7 @@ const styles = StyleSheet.create({
     width: 70,
   },
   scoreText: {
-    color: "#0f172a",
+    color: AppColors.ink,
     fontSize: 17,
     fontWeight: "800",
   },
@@ -292,18 +289,18 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   signalCount: {
-    color: "#64748b",
+    color: AppColors.muted,
     fontSize: 12,
     fontWeight: "600",
   },
   summary: {
-    color: "#334155",
+    color: "#3c342a",
     fontSize: 14,
     lineHeight: 21,
     marginTop: 12,
   },
   expanded: {
-    borderTopColor: "#e2e8f0",
+    borderTopColor: AppColors.subtle,
     borderTopWidth: 1,
     marginTop: 14,
     paddingTop: 14,
@@ -312,7 +309,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   sectionTitle: {
-    color: "#0f172a",
+    color: AppColors.ink,
     fontSize: 13,
     fontWeight: "800",
     marginBottom: 8,
@@ -324,8 +321,8 @@ const styles = StyleSheet.create({
   },
   planetPill: {
     alignItems: "center",
-    backgroundColor: "#f8fafc",
-    borderColor: "#e2e8f0",
+    backgroundColor: AppColors.surface,
+    borderColor: AppColors.subtle,
     borderRadius: 6,
     borderWidth: 1,
     flexDirection: "row",
@@ -334,13 +331,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   planetText: {
-    color: "#334155",
+    color: AppColors.ink,
     fontSize: 12,
     fontWeight: "700",
   },
   timingBox: {
     alignItems: "center",
-    backgroundColor: "#f8fafc",
+    backgroundColor: AppColors.surface,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: "row",
@@ -349,7 +346,7 @@ const styles = StyleSheet.create({
     padding: 11,
   },
   timingText: {
-    color: "#334155",
+    color: AppColors.ink,
     flex: 1,
     fontSize: 13,
     fontWeight: "700",
@@ -361,7 +358,7 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
   driverText: {
-    color: "#334155",
+    color: "#3c342a",
     flex: 1,
     fontSize: 13,
     lineHeight: 19,
@@ -371,8 +368,8 @@ const styles = StyleSheet.create({
   },
   challengeChip: {
     alignItems: "flex-start",
-    backgroundColor: "#fef2f2",
-    borderColor: "#fecaca",
+    backgroundColor: AppColors.roseSoft,
+    borderColor: "#f6b8b2",
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: "row",
@@ -380,7 +377,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   challengeText: {
-    color: "#7f1d1d",
+    color: "#7a271a",
     flex: 1,
     fontSize: 12,
     fontWeight: "600",

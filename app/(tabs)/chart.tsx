@@ -6,63 +6,40 @@ import {
   Modal,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
-
-import { useState, useEffect } from "react";
-
+import { useEffect, useState } from "react";
 import axios from "axios";
-
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import NorthIndianChart from "@/components/north-indian-chart";
-
 import transformChart from "@/app/services/chartTransformer";
-
 import { useKundli } from "@/context/KundliContext";
+import { AppColors, AppShadows } from "@/constants/theme";
 
 export default function Chart() {
-
   const { kundli, setKundli } = useKundli();
-
-  // 🔥 local picker states
-  const [date, setDate] = useState(
-    kundli.dob
-      ? new Date(kundli.dob)
-      : new Date()
-  );
-
+  const [date, setDate] = useState(kundli.dob ? new Date(kundli.dob) : new Date());
+  const insets = useSafeAreaInsets();
   const [timeObj, setTimeObj] = useState(new Date());
-
   const [showDate, setShowDate] = useState(false);
-
   const [showTime, setShowTime] = useState(false);
-
   const [chartData, setChartData] = useState<any>(null);
-
   const [visible, setVisible] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
-  // 🔥 initialize time object from context
   useEffect(() => {
+    if (!kundli.time) return;
 
-    if (kundli.time) {
+    const [h, m] = kundli.time.split(":");
+    const t = new Date();
+    t.setHours(Number(h));
+    t.setMinutes(Number(m));
+    setTimeObj(t);
+  }, [kundli.time]);
 
-      const [h, m] = kundli.time.split(":");
-
-      const t = new Date();
-
-      t.setHours(Number(h));
-
-      t.setMinutes(Number(m));
-
-      setTimeObj(t);
-    }
-
-  }, []);
-
-  const formatDate = (d: Date) =>
-    d.toISOString().split("T")[0];
+  const formatDate = (d: Date) => d.toISOString().split("T")[0];
 
   const formatTime = (t: Date) =>
     `${t.getHours().toString().padStart(2, "0")}:${t
@@ -70,286 +47,403 @@ export default function Chart() {
       .toString()
       .padStart(2, "0")}`;
 
-  // 🔥 API CALL
   const fetchChart = async () => {
-
     try {
-
       setLoading(true);
 
-      const res = await axios.get(
-        "https://astro-backend-beryl.vercel.app/chart",
-        {
-          params: {
-            dob: kundli.dob,
-            time: kundli.time,
-            place: kundli.place,
-          },
-        }
-      );
+      const res = await axios.get("https://astro-backend-beryl.vercel.app/chart", {
+        params: {
+          dob: kundli.dob,
+          time: kundli.time,
+          place: kundli.place,
+        },
+      });
 
-      const transformed = transformChart(res.data);
-
-      setChartData(transformed);
-
+      setChartData(transformChart(res.data));
       setVisible(true);
-
     } catch (e) {
-
       console.log(e);
-
     } finally {
-
       setLoading(false);
     }
   };
 
+  const canGenerate = Boolean(kundli.dob && kundli.time && kundli.place);
+
   return (
-    <View style={styles.container}>
-
-      {/* 🔥 HEADER */}
-      <Text style={styles.header}>
-        🔮 Kundli Generator
-      </Text>
-
-      {/* 🔥 CARD */}
-      <View style={styles.card}>
-
-        {/* DATE */}
-        <Text style={styles.label}>
-          Date of Birth
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: insets.top + 18,
+          paddingBottom: insets.bottom + 96,
+        },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.headerBlock}>
+        <View style={styles.mark}>
+          <Ionicons name="sparkles-outline" size={22} color={AppColors.gold} />
+        </View>
+        <Text style={styles.eyebrow}>Birth chart</Text>
+        <Text style={styles.header}>Create Your Kundli</Text>
+        <Text style={styles.subheader}>
+          Enter precise birth details to generate the chart used by insights and AI readings.
         </Text>
+      </View>
 
-        <TouchableOpacity
-          style={styles.input}
+      <View style={styles.card}>
+        <FieldShell
+          icon="calendar-outline"
+          label="Date of Birth"
+          value={kundli.dob || "Select birth date"}
+          muted={!kundli.dob}
           onPress={() => setShowDate(true)}
-        >
-          <Text style={styles.inputText}>
-            {kundli.dob}
-          </Text>
-        </TouchableOpacity>
+        />
 
         {showDate && (
           <DateTimePicker
             value={date}
             mode="date"
             onChange={(e, selected) => {
-
               setShowDate(false);
 
               if (selected) {
-
                 setDate(selected);
-
-                setKundli({
-                  ...kundli,
+                setKundli((current) => ({
+                  ...current,
                   dob: formatDate(selected),
-                });
+                }));
               }
             }}
           />
         )}
 
-        {/* TIME */}
-        <Text style={styles.label}>
-          Birth Time
-        </Text>
-
-        <TouchableOpacity
-          style={styles.input}
+        <FieldShell
+          icon="time-outline"
+          label="Birth Time"
+          value={kundli.time || "Select birth time"}
+          muted={!kundli.time}
           onPress={() => setShowTime(true)}
-        >
-          <Text style={styles.inputText}>
-            {kundli.time}
-          </Text>
-        </TouchableOpacity>
+        />
 
         {showTime && (
           <DateTimePicker
             value={timeObj}
             mode="time"
             onChange={(e, selected) => {
-
               setShowTime(false);
 
               if (selected) {
-
                 setTimeObj(selected);
-
-                setKundli({
-                  ...kundli,
+                setKundli((current) => ({
+                  ...current,
                   time: formatTime(selected),
-                });
+                }));
               }
             }}
           />
         )}
 
-        {/* PLACE */}
-        <Text style={styles.label}>
-          Birth Place
-        </Text>
-
-        <TextInput
-          value={kundli.place}
-          onChangeText={(v) =>
-            setKundli({
-              ...kundli,
-              place: v,
-            })
-          }
-          placeholder="Enter city"
-          placeholderTextColor="#999"
-          style={styles.input}
-        />
-
-        {/* BUTTON */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={fetchChart}
-        >
-          <Text style={styles.buttonText}>
-            {loading
-              ? "Generating..."
-              : "Generate Chart"}
-          </Text>
-        </TouchableOpacity>
-
-      </View>
-
-      {/* 🔥 MODAL */}
-      <Modal
-        visible={visible}
-        animationType="slide"
-      >
-
-        <View style={styles.modalContainer}>
-
-          <Text style={styles.modalTitle}>
-            North Indian Chart
-          </Text>
-
-          <ScrollView
-            style={{ width: "100%" }}
-            contentContainerStyle={{
-              alignItems: "center",
-              paddingBottom: 30,
-            }}
-          >
-
-            {chartData && (
-              <NorthIndianChart
-                chartData={chartData}
-              />
-            )}
-
-          </ScrollView>
-
-          <TouchableOpacity
-            onPress={() => setVisible(false)}
-          >
-            <Text style={styles.close}>
-              Close
-            </Text>
-          </TouchableOpacity>
-
+        <View style={styles.textField}>
+          <View style={styles.fieldIcon}>
+            <Ionicons name="location-outline" size={18} color={AppColors.indigo} />
+          </View>
+          <View style={styles.fieldTextGroup}>
+            <Text style={styles.label}>Birth Place</Text>
+            <TextInput
+              value={kundli.place}
+              onChangeText={(v) =>
+                setKundli((current) => ({
+                  ...current,
+                  place: v,
+                }))
+              }
+              placeholder="City, state or country"
+              placeholderTextColor="#9a8f82"
+              style={styles.input}
+            />
+          </View>
         </View>
 
-      </Modal>
+        <TouchableOpacity
+          activeOpacity={0.86}
+          disabled={!canGenerate || loading}
+          style={[styles.button, (!canGenerate || loading) && styles.buttonDisabled]}
+          onPress={fetchChart}
+        >
+          {loading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <>
+              <Ionicons name="grid-outline" size={18} color="#ffffff" />
+              <Text style={styles.buttonText}>Generate Chart</Text>
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
 
-    </View>
+      <View style={styles.noteCard}>
+        <Ionicons name="shield-checkmark-outline" size={20} color={AppColors.teal} />
+        <Text style={styles.noteText}>
+          The same birth details power the chart, life-area insights, and AI answers.
+        </Text>
+      </View>
+
+      <Modal visible={visible} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <View>
+              <Text style={styles.modalEyebrow}>Generated chart</Text>
+              <Text style={styles.modalTitle}>North Indian Chart</Text>
+            </View>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setVisible(false)}>
+              <Ionicons name="close" size={22} color={AppColors.ink} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            style={styles.modalScroll}
+            contentContainerStyle={styles.modalContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {chartData && (
+              <View style={styles.chartFrame}>
+                <NorthIndianChart chartData={chartData} />
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </Modal>
+    </ScrollView>
+  );
+}
+
+function FieldShell({
+  icon,
+  label,
+  value,
+  muted,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  value: string;
+  muted?: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity activeOpacity={0.82} style={styles.field} onPress={onPress}>
+      <View style={styles.fieldIcon}>
+        <Ionicons name={icon} size={18} color={AppColors.indigo} />
+      </View>
+      <View style={styles.fieldTextGroup}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.fieldValue, muted && styles.mutedValue]}>{value}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color="#9a8f82" />
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
+    backgroundColor: AppColors.background,
     flex: 1,
-    backgroundColor: "#f3f6fb",
+  },
+  content: {
+    padding: 18,
+    paddingBottom: 32,
+  },
+  headerBlock: {
+    backgroundColor: AppColors.ink,
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: "hidden",
     padding: 20,
+    ...AppShadows.card,
   },
-
-  header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#111827",
-  },
-
-  card: {
-    backgroundColor: "white",
-    padding: 22,
-    borderRadius: 20,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-
-    elevation: 6,
-  },
-
-  label: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginTop: 14,
-    marginBottom: 6,
-    fontWeight: "600",
-  },
-
-  input: {
+  mark: {
+    alignItems: "center",
+    backgroundColor: "rgba(255,250,242,0.1)",
+    borderColor: "rgba(255,250,242,0.18)",
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-
-    padding: 15,
-
-    borderRadius: 14,
-
-    backgroundColor: "#fafafa",
+    height: 42,
+    justifyContent: "center",
+    marginBottom: 18,
+    width: 42,
   },
-
-  inputText: {
-    color: "#111827",
-    fontSize: 15,
+  eyebrow: {
+    color: AppColors.gold,
+    fontSize: 12,
+    fontWeight: "800",
+    marginBottom: 6,
+    textTransform: "uppercase",
   },
-
-  button: {
-    backgroundColor: "#4f46e5",
-
-    padding: 16,
-
-    borderRadius: 14,
-
-    marginTop: 24,
-
+  header: {
+    color: "#ffffff",
+    fontSize: 31,
+    fontWeight: "900",
+  },
+  subheader: {
+    color: "#c9c5bc",
+    fontSize: 14,
+    lineHeight: 21,
+    marginTop: 8,
+  },
+  card: {
+    backgroundColor: AppColors.surfaceElevated,
+    borderColor: AppColors.line,
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 14,
+    ...AppShadows.card,
+  },
+  field: {
     alignItems: "center",
+    backgroundColor: AppColors.surface,
+    borderColor: AppColors.subtle,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: "row",
+    marginBottom: 12,
+    minHeight: 68,
+    padding: 12,
   },
-
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
+  textField: {
+    alignItems: "center",
+    backgroundColor: AppColors.surface,
+    borderColor: AppColors.subtle,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: "row",
+    marginBottom: 12,
+    minHeight: 72,
+    padding: 12,
   },
-
-  modalContainer: {
+  fieldIcon: {
+    alignItems: "center",
+    backgroundColor: AppColors.indigoSoft,
+    borderRadius: 8,
+    height: 38,
+    justifyContent: "center",
+    marginRight: 12,
+    width: 38,
+  },
+  fieldTextGroup: {
     flex: 1,
-    backgroundColor: "white",
-    paddingTop: 60,
+  },
+  label: {
+    color: AppColors.gold,
+    fontSize: 11,
+    fontWeight: "900",
+    marginBottom: 4,
+    textTransform: "uppercase",
+  },
+  fieldValue: {
+    color: AppColors.ink,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  mutedValue: {
+    color: "#9a8f82",
+  },
+  input: {
+    color: AppColors.ink,
+    fontSize: 16,
+    fontWeight: "800",
+    margin: 0,
+    padding: 0,
+  },
+  button: {
     alignItems: "center",
+    backgroundColor: AppColors.indigo,
+    borderRadius: 8,
+    flexDirection: "row",
+    gap: 9,
+    justifyContent: "center",
+    marginTop: 6,
+    minHeight: 54,
+    padding: 15,
   },
-
+  buttonDisabled: {
+    backgroundColor: "#9da7c9",
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+  noteCard: {
+    alignItems: "center",
+    backgroundColor: AppColors.tealSoft,
+    borderColor: "#b7ebe4",
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 14,
+    padding: 13,
+  },
+  noteText: {
+    color: "#134e4a",
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    lineHeight: 18,
+  },
+  modalContainer: {
+    backgroundColor: AppColors.background,
+    flex: 1,
+    paddingTop: 54,
+  },
+  modalHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 18,
+    paddingBottom: 14,
+  },
+  modalEyebrow: {
+    color: AppColors.gold,
+    fontSize: 12,
+    fontWeight: "900",
+    textTransform: "uppercase",
+  },
   modalTitle: {
+    color: AppColors.ink,
     fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#111827",
+    fontWeight: "900",
+    marginTop: 2,
   },
-
-  close: {
-    marginTop: 10,
-    marginBottom: 30,
-    fontSize: 18,
-    color: "#4f46e5",
-    fontWeight: "600",
+  closeButton: {
+    alignItems: "center",
+    backgroundColor: AppColors.surfaceElevated,
+    borderColor: AppColors.line,
+    borderRadius: 8,
+    borderWidth: 1,
+    height: 42,
+    justifyContent: "center",
+    width: 42,
   },
-
+  modalScroll: {
+    width: "100%",
+  },
+  modalContent: {
+    alignItems: "center",
+    padding: 18,
+    paddingBottom: 36,
+  },
+  chartFrame: {
+    alignItems: "center",
+    backgroundColor: AppColors.surfaceElevated,
+    borderColor: AppColors.line,
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 16,
+    width: "100%",
+    ...AppShadows.card,
+  },
 });

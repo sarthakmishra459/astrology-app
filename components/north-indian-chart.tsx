@@ -8,6 +8,7 @@ import Svg, {
   LinearGradient,
   Stop,
 } from "react-native-svg";
+import { AppColors } from "@/constants/theme";
 
 export default function NorthIndianChart({
   chartData,
@@ -102,12 +103,12 @@ export default function NorthIndianChart({
           >
             <Stop
               offset="0%"
-              stopColor="white"
+              stopColor="#fffaf2"
             />
 
             <Stop
               offset="100%"
-              stopColor="#f0f3bf"
+              stopColor="#f6ead3"
             />
 
           </LinearGradient>
@@ -120,84 +121,96 @@ export default function NorthIndianChart({
         <Polygon
           points="100,225 200,300 300,225 200,150"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 2 */}
         <Polygon
           points="100,225 0,300 200,300"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 3 */}
         <Polygon
           points="0,150 0,300 100,225"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 4 */}
         <Polygon
           points="0,150 100,225 200,150 100,75"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 5 */}
         <Polygon
           points="0,0 0,150 100,75"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 6 */}
         <Polygon
           points="0,0 100,75 200,0"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 7 */}
         <Polygon
           points="100,75 200,150 300,75 200,0"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 8 */}
         <Polygon
           points="200,0 300,75 400,0"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 9 */}
         <Polygon
           points="300,75 400,150 400,0"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 10 */}
         <Polygon
           points="300,75 200,150 300,225 400,150"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 11 */}
         <Polygon
           points="300,225 400,300 400,150"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 12 */}
         <Polygon
           points="300,225 200,300 400,300"
           fill="url(#grad)"
-          stroke="black"
+          stroke="#6d5b43"
+          strokeWidth="1.4"
         />
 
         {/* 🔥 RASHI LABELS */}
@@ -210,18 +223,18 @@ export default function NorthIndianChart({
               x={labelPositions[i][0]}
               y={labelPositions[i][1]}
 
-              fontSize="11"
+              fontSize="12"
 
               fill={
                 i === 0
-                  ? "red"
-                  : "teal"
+                  ? AppColors.rose
+                  : AppColors.teal
               }
 
               fontWeight={
                 i === 0
-                  ? "bold"
-                  : "normal"
+                  ? "800"
+                  : "700"
               }
 
               textAnchor="middle"
@@ -261,6 +274,10 @@ export default function NorthIndianChart({
                   }
 
                   fontSize="11"
+
+                  fill={AppColors.indigo}
+
+                  fontWeight="800"
 
                   textAnchor="middle"
                 >

@@ -1,7 +1,12 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AppColors } from "@/constants/theme";
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = Math.max(insets.bottom, 10);
+
   return (
     <Tabs
       screenOptions={({ route }) => ({
@@ -20,8 +25,20 @@ export default function TabLayout() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "gray",
+        headerShown: false,
+        tabBarActiveTintColor: AppColors.indigo,
+        tabBarInactiveTintColor: "#9a8f82",
+        tabBarStyle: {
+          backgroundColor: AppColors.surfaceElevated,
+          borderTopColor: AppColors.line,
+          height: 58 + bottomInset,
+          paddingBottom: bottomInset,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "700",
+        },
       })}
     >
       <Tabs.Screen name="chart" options={{ title: "Chart" }} />

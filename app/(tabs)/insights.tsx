@@ -9,9 +9,11 @@ import {
 } from "react-native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import InsightCard, { InsightCardData } from "@/components/insights-card";
 import { useKundli } from "@/context/KundliContext";
+import { AppColors, AppShadows } from "@/constants/theme";
 
 type InsightsResponse = {
   birth_details: {
@@ -26,6 +28,7 @@ const API_BASE_URL = "https://astro-backend-beryl.vercel.app";
 
 export default function Insights() {
   const { kundli } = useKundli();
+  const insets = useSafeAreaInsets();
   const [cards, setCards] = useState<InsightCardData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,14 +81,20 @@ export default function Insights() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: insets.top + 18,
+          paddingBottom: insets.bottom + 96,
+        },
+      ]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.topBar}>
         <View>
           <Text style={styles.header}>Life Insights</Text>
           <Text style={styles.subheader}>
-            Chart-based strengths across major life areas
+            A clear read on strengths, pressure points, and timing across life areas
           </Text>
         </View>
 
@@ -100,7 +109,7 @@ export default function Insights() {
 
       {kundli.place ? (
         <View style={styles.birthStrip}>
-          <Ionicons name="location-outline" size={16} color="#475569" />
+          <Ionicons name="location-outline" size={16} color={AppColors.indigo} />
           <Text style={styles.birthText}>
             {kundli.place} | {kundli.dob} | {kundli.time}
           </Text>
@@ -110,7 +119,7 @@ export default function Insights() {
       {strongestCard && (
         <View style={styles.snapshot}>
           <View style={styles.snapshotIcon}>
-            <Ionicons name="analytics-outline" size={18} color="#1d4ed8" />
+            <Ionicons name="analytics-outline" size={18} color={AppColors.gold} />
           </View>
           <View style={styles.snapshotTextGroup}>
             <Text style={styles.snapshotLabel}>Strongest area</Text>
@@ -123,14 +132,14 @@ export default function Insights() {
 
       {loading && (
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#1d4ed8" />
+          <ActivityIndicator size="large" color={AppColors.indigo} />
           <Text style={styles.loaderText}>Reading chart signals</Text>
         </View>
       )}
 
       {!loading && error && (
         <View style={styles.emptyState}>
-          <Ionicons name="information-circle-outline" size={28} color="#64748b" />
+          <Ionicons name="information-circle-outline" size={28} color={AppColors.gold} />
           <Text style={styles.emptyTitle}>Insights unavailable</Text>
           <Text style={styles.emptyText}>{error}</Text>
         </View>
@@ -145,7 +154,7 @@ export default function Insights() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: AppColors.background,
     flex: 1,
   },
   content: {
@@ -154,24 +163,30 @@ const styles = StyleSheet.create({
   },
   topBar: {
     alignItems: "center",
+    backgroundColor: AppColors.ink,
+    borderRadius: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 14,
+    padding: 18,
+    ...AppShadows.card,
   },
   header: {
-    color: "#0f172a",
+    color: "#ffffff",
     fontSize: 30,
     fontWeight: "900",
   },
   subheader: {
-    color: "#64748b",
+    color: "#c9c5bc",
     fontSize: 13,
+    lineHeight: 19,
     marginTop: 4,
+    maxWidth: 290,
   },
   refreshButton: {
     alignItems: "center",
-    backgroundColor: "#eff6ff",
-    borderColor: "#bfdbfe",
+    backgroundColor: "rgba(255,250,242,0.1)",
+    borderColor: "rgba(255,250,242,0.18)",
     borderRadius: 8,
     borderWidth: 1,
     height: 42,
@@ -180,35 +195,37 @@ const styles = StyleSheet.create({
   },
   birthStrip: {
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderColor: "#e2e8f0",
+    backgroundColor: AppColors.surfaceElevated,
+    borderColor: AppColors.line,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: "row",
     gap: 7,
     marginBottom: 12,
     padding: 11,
+    ...AppShadows.soft,
   },
   birthText: {
-    color: "#475569",
+    color: AppColors.ink,
     flex: 1,
     fontSize: 12,
     fontWeight: "700",
   },
   snapshot: {
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderColor: "#dbeafe",
+    backgroundColor: AppColors.ink,
+    borderColor: "#2f3448",
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: "row",
     gap: 11,
     marginBottom: 14,
     padding: 13,
+    ...AppShadows.card,
   },
   snapshotIcon: {
     alignItems: "center",
-    backgroundColor: "#eff6ff",
+    backgroundColor: "rgba(255,250,242,0.1)",
     borderRadius: 8,
     height: 38,
     justifyContent: "center",
@@ -218,47 +235,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   snapshotLabel: {
-    color: "#64748b",
+    color: "#c9c5bc",
     fontSize: 12,
     fontWeight: "700",
   },
   snapshotTitle: {
-    color: "#0f172a",
+    color: "#ffffff",
     fontSize: 15,
     fontWeight: "900",
     marginTop: 2,
   },
   loader: {
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderColor: "#e2e8f0",
+    backgroundColor: AppColors.surfaceElevated,
+    borderColor: AppColors.line,
     borderRadius: 8,
     borderWidth: 1,
     justifyContent: "center",
     minHeight: 220,
+    ...AppShadows.soft,
   },
   loaderText: {
-    color: "#64748b",
+    color: AppColors.muted,
     fontSize: 13,
     fontWeight: "700",
     marginTop: 12,
   },
   emptyState: {
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderColor: "#e2e8f0",
+    backgroundColor: AppColors.surfaceElevated,
+    borderColor: AppColors.line,
     borderRadius: 8,
     borderWidth: 1,
     padding: 24,
+    ...AppShadows.soft,
   },
   emptyTitle: {
-    color: "#0f172a",
+    color: AppColors.ink,
     fontSize: 17,
     fontWeight: "900",
     marginTop: 9,
   },
   emptyText: {
-    color: "#64748b",
+    color: AppColors.muted,
     fontSize: 13,
     lineHeight: 19,
     marginTop: 5,
