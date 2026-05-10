@@ -12,6 +12,8 @@ export default function TabLayout() {
             iconName = "person-circle-outline";
           } else if (route.name === "chart") {
             iconName = "grid-outline";
+          } else if (route.name === "insights") {
+            iconName = "analytics-outline";
           } else if (route.name === "ai") {
             iconName = "chatbubble-ellipses-outline";
           }
@@ -23,6 +25,12 @@ export default function TabLayout() {
       })}
     >
       <Tabs.Screen name="chart" options={{ title: "Chart" }} />
+      <Tabs.Screen
+        name="insights"
+        options={{
+          title: "Insights",
+        }}
+      />
       <Tabs.Screen name="ai" options={{ title: "AI" }} />
     </Tabs>
   );

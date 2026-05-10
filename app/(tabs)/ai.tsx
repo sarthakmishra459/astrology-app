@@ -12,12 +12,12 @@ import { useState, useRef } from "react";
 import axios from "axios";
 import Markdown from "react-native-markdown-display";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useKundli } from "@/context/KundliContext";
 export default function AI() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const listRef = useRef<FlatList>(null);
-
+  const {kundli} = useKundli();
   const askAI = async () => {
     if (!question.trim()) return;
 
@@ -29,9 +29,9 @@ export default function AI() {
     try {
       const res = await axios.post("http://192.168.1.5:8000/ai", {
         question,
-        dob: "2003-09-03",
-        time: "15:43",
-        place: "Rourkela",
+        dob: kundli.dob,
+        time: kundli.time,
+        place: kundli.place,
       });
 
       const aiMsg = { role: "ai", content: res.data.answer };
