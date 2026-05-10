@@ -45,7 +45,7 @@ export default function AI() {
     setQuestion("");
 
     try {
-      const res = await axios.post("http://192.168.1.5:8000/ai", {
+      const res = await axios.post("https://astro-backend-beryl.vercel.app/ai", {
         question: finalQuestion,
         dob: kundli.dob,
         time: kundli.time,
